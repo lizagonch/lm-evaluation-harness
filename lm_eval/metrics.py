@@ -44,6 +44,55 @@ def f1_score(items):
 
     return np.max(fscore)
 
+def f1_per_dataset(items):
+    # Only count as correct if all answers are labeled correctly for each question
+    question_scoring_dict = {}
+    preds = list(zip(*items))[0]
+    docs = list(zip(*items))[1]
+
+    correctCount = 0
+    predictCount = 0
+    for doc, pred in zip(docs, preds):
+        paragraph_id = doc["idx"]["paragraph"]
+        question_id = doc["idx"]["question"]
+        if (paragraph_id, question_id) not in question_scoring_dict:
+            question_scoring_dict[(paragraph_id, question_id)] = []
+
+        gold_label = doc["label"]
+        question_scoring_dict[(paragraph_id, question_id)].append(gold_label * int(pred))
+        
+        correctCount += gold_label
+        predictCount += int(pred)
+
+    agreementCount = np.sum([np.sum(x) for x in question_scoring_dict.values()])
+    
+    p1 = (1.0 * agreementCount / predictCount) if predictCount > 0.0 else 1.0
+    r1 = (1.0 * agreementCount / correctCount) if correctCount > 0.0 else 1.0
+    f1_score = 2 * r1 * p1 / (p1 + r1)
+    return f1_score
+
+def f1_per_dataset_stderr(items):
+    # Only count as correct if all answers are labeled correctly for each question
+    question_scoring_dict = {}
+    preds = list(zip(*items))[0]
+    docs = list(zip(*items))[1]
+
+    correctCount = 0
+    predictCount = 0
+    for doc, pred in zip(docs, preds):
+        paragraph_id = doc["idx"]["paragraph"]
+        question_id = doc["idx"]["question"]
+        if (paragraph_id, question_id) not in question_scoring_dict:
+            question_scoring_dict[(paragraph_id, question_id)] = []
+
+        gold_label = doc["label"]
+        question_scoring_dict[(paragraph_id, question_id)].append(gold_label * int(pred))
+        
+        correctCount += gold_label
+        predictCount += int(pred)
+
+    agreementCount = mean_stderr([np.sum(x) for x in question_scoring_dict.values()])
+    return agreementCount
 
 def acc_all(items):
     # Only count as correct if all answers are labeled correctly for each question
@@ -247,7 +296,7 @@ def stderr_for_metric(metric, bootstrap_iters):
     if metric in bootstrappable:
         return lambda x: bootstrap_stderr(metric, x, iters=bootstrap_iters)
 
-    stderr = {mean: mean_stderr, acc_all: acc_all_stderr}
+    stderr = {mean: mean_stderr, acc_all: acc_all_stderr, f1_per_dataset: f1_per_dataset_stderr}
 
     return stderr.get(metric, None)
 
@@ -257,3 +306,9 @@ def yesno(x):
         return "yes"
     else:
         return "no"
+    
+def yesno_rus(x):
+    if x:
+        return "да"
+    else:
+        return "нет"

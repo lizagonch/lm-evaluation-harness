@@ -62,6 +62,7 @@ from . import pawsx
 from . import xnli
 from . import mgsm
 from . import scrolls
+from . import rsg
 
 ########################################
 # Translation tasks
@@ -317,6 +318,16 @@ TASK_REGISTRY = {
     "crows_pairs_french_nationality": crowspairs.CrowsPairsFrenchNationality,
     "crows_pairs_french_physical_appearance": crowspairs.CrowsPairsFrenchPhysicalAppearance,
     "crows_pairs_french_autre": crowspairs.CrowsPairsFrenchAutre,
+    # RSG
+    "danetqa": rsg.DaNetQA,
+    "rucos": rsg.RuCoS,
+    "rwsd": rsg.RusWinogradSchemaChallenge,
+    "russe": rsg.RUSSE,
+    "terra": rsg.TERRa,
+    "muserc": rsg.MuSeRC,
+    "parus": rsg.PARus,
+    "rcb": rsg.RussianCommitmentBank,
+    "lidirus": rsg.LiDiRus,
     # Requires manual download of data.
     # "storycloze_2016": storycloze.StoryCloze2016,
     # "storycloze_2018": storycloze.StoryCloze2018,
