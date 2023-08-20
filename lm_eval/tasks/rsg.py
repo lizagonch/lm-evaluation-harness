@@ -120,7 +120,7 @@ class RuCoS(Task):
         return True
 
     def has_test_docs(self):
-        return True
+        return False
 
     def training_docs(self):
         # In RuCoS, each doc manifests multiple "examples" in the context of few shot example packing.
@@ -145,8 +145,8 @@ class RuCoS(Task):
         return {
                 "passage": doc["passage"],
                 "query": doc["query"],
-                "entities": doc["entities"], #sorted(list(set(doc["entities"]))),
-                "answers": ["some answer"], #sorted(list(set(doc["answers"]))),
+                "entities": sorted(list(set(doc["entities"]))), #doc["entities"], #
+                "answers": sorted(list(set(doc["answers"]))), #["some answer"], #
         }
 
     def doc_to_text(self, doc):
@@ -172,7 +172,7 @@ class RuCoS(Task):
         return requests
 
     def process_results(self, doc, results):
-        # RuCoS's evaluation is actually deceptively simple:
+        # ReCoRD's evaluation is actually deceptively simple:
         # - Pick the maximum likelihood prediction entity
         # - Evaluate the accuracy and token F1 PER EXAMPLE
         # - Average over all examples
@@ -180,10 +180,6 @@ class RuCoS(Task):
 
         prediction = doc["entities"][max_idx]
         gold_label_set = doc["answers"]
-
-        ## if gold_label_set is empty (in a case of test set) put some random answer there
-        if (len(gold_label_set) == 0):
-            gold_label_set = ["asnwer"]
         f1 = metric_max_over_ground_truths(
             squad_metrics.compute_f1, prediction, gold_label_set
         )
@@ -351,7 +347,7 @@ class TERRa(Task):
         return True
 
     def has_test_docs(self):
-        return True
+        return False
 
     def training_docs(self):
         if self._training_docs is None:
@@ -465,7 +461,7 @@ class PARus(Task):
         return True
 
     def has_test_docs(self):
-        return True
+        return False
 
     def training_docs(self):
         if self._training_docs is None:
